@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     late AnimationController _batteryAnimationController;
     late Animation<double> _animationBattery;
-    
+    late Animation<double> _animationBatteryStatus;
 
     
 
@@ -33,7 +33,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         _animationBattery = CurvedAnimation(
             parent: _batteryAnimationController, 
             curve: Interval(0.0, 0.5),
+        );
 
+        _animationBatteryStatus = CurvedAnimation(
+            parent: _batteryAnimationController, 
+            curve: Interval(0.6, 1,),
         );
     }
 
@@ -138,7 +142,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                           width: constrains.maxWidth * 0.45,             
                                       ),
                                     ),
-                                 BatteryStatus(constrains: constrains,),     
+                                 Positioned(
+                                 top: 50 * ( 1 - _animationBatteryStatus.value ),
+                                 height: constrains.maxHeight,
+                                 width: constrains.maxWidth,
+                                   child: Opacity(
+                                   opacity: _animationBatteryStatus.value,
+                                   child: BatteryStatus(
+                                      constrains: constrains,
+                                     ),
+                                                                   ),
+                                 ),     
 
                             ],
                         )  ;
