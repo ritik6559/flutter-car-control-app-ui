@@ -7,6 +7,7 @@ class HomeController extends ChangeNotifier {
     bool isBonnetLocked = true;
     int selectedBottomTab = 0;
     bool isCoolSelected = true;
+    bool isShowTyre = false;
 
     void onButtonNavigationTabChange(int index){
         selectedBottomTab = index;
@@ -36,6 +37,15 @@ class HomeController extends ChangeNotifier {
     void updateCoolSelected(){
         isCoolSelected = !isCoolSelected;
         notifyListeners();
+    }
+
+    void showTyreController(int index){
+        if( selectedBottomTab != 3 && index == 3){
+            isShowTyre = true;
+            notifyListeners();
+        } else {
+            isShowTyre = false; 
+        }
     }
 
 

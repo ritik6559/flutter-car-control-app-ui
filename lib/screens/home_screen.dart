@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 
 import 'components/battery_status.dart';
 import 'components/temp_details.dart';
+import 'components/tyres.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -99,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               } else if (_controller.selectedBottomTab == 2 && index != 2) {
                 _tempAnimationController.reverse(from: 0.4);
               }
-              _controller.onButtonNavigationTabChange(index);
+              _controller.showTyreController(index);              _controller.onButtonNavigationTabChange(index);
             },
             selectedTab: _controller.selectedBottomTab,
           ),
@@ -227,6 +228,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                         ),
                       ),
+
+
+
+                       if( _controller.isShowTyre ) ...tyres(constrains),
+                      
                   ],
                 );
               },
@@ -236,6 +242,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       },
     );
   }
+
 }
 
 
