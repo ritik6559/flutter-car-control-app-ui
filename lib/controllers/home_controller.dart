@@ -8,7 +8,19 @@ class HomeController extends ChangeNotifier {
     int selectedBottomTab = 0;
     bool isCoolSelected = true;
     bool isShowTyre = false;
+    bool isShowTyreStatus = false;
 
+  void tyreStatusController(int index) {
+    if (selectedBottomTab != 3 && index == 3) {
+      isShowTyreStatus = true;
+      notifyListeners();
+    } else {
+      Future.delayed(Duration(milliseconds: 400), () {
+        isShowTyreStatus = false;
+        notifyListeners();
+      });
+    }
+  }
     void onButtonNavigationTabChange(int index){
         selectedBottomTab = index;
         notifyListeners();

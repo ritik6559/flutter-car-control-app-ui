@@ -5,8 +5,10 @@ import 'package:flutter_car_control_app_ui/screens/components/car_app_nav_bar.da
 import 'package:flutter_car_control_app_ui/screens/components/door_lock.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../models/TyrePsi.dart';
 import 'components/battery_status.dart';
 import 'components/temp_details.dart';
+import 'components/tyre_psi_card.dart';
 import 'components/tyres.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,6 +29,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _animationCarShift;
   late Animation<double> _animationTempShowInfo;
   late Animation<double> _animationCoolGlow;
+  
+  late AnimationController _tyreAnimationController;
+  late Animation<double> _animationTyre1Psi;
+  late Animation<double> _animationTyre2Psi;
+  late Animation<double> _animationTyre3Psi;
+  late Animation<double> _animationTyre4Psi;
+
+  late List<Animation<double>> _tyreAnimations;
+  
+  void setupTyreAnimation() {
+    _tyreAnimationController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 1200));
+    _animationTyre1Psi = CurvedAnimation(
+        parent: _tyreAnimationController, curve: Interval(0.34, 0.5));
+    _animationTyre2Psi = CurvedAnimation(
+        parent: _tyreAnimationController, curve: Interval(0.5, 0.66));
+    _animationTyre3Psi = CurvedAnimation(
+        parent: _tyreAnimationController, curve: Interval(0.66, 0.82));
+    _animationTyre4Psi = CurvedAnimation(
+        parent: _tyreAnimationController, curve: Interval(0.82, 1));
+    _tyreAnimations = [
+      _animationTyre1Psi,
+      _animationTyre2Psi,
+      _animationTyre3Psi,
+      _animationTyre4Psi,
+    ];
+  }
 
   void setupTempAnimation() {
     _tempAnimationController = AnimationController(
@@ -68,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     setupBatteryAnimation();
     setupTempAnimation();
+    setupTyreAnimation();
     super.initState();
   }
 
@@ -76,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
     _batteryAnimationController.dispose();
     _tempAnimationController.dispose();
+    _tyreAnimationController.dispose();
   }
 
   @override
@@ -84,7 +115,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       animation: Listenable.merge({
         _controller,
         _batteryAnimationController,
-        _tempAnimationController
+        _tempAnimationController,
+        _tyreAnimationController
       }),
       builder: (context, snapshot) {
         return Scaffold(
@@ -100,7 +132,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               } else if (_controller.selectedBottomTab == 2 && index != 2) {
                 _tempAnimationController.reverse(from: 0.4);
               }
-              _controller.showTyreController(index);              _controller.onButtonNavigationTabChange(index);
+              if (index == 3){
+                  _tyreAnimationController.forward(); 
+              } else if (_controller.selectedBottomTab == 3 && index != 3){
+                  _tyreAnimationController.reverse();
+              }
+
+              _controller.showTyreController(index);
+              _controller.tyreStatusController(index);              
+              _controller.onButtonNavigationTabChange(index);
             },
             selectedTab: _controller.selectedBottomTab,
           ),
@@ -232,73 +272,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
 
                        if( _controller.isShowTyre ) ...tyres(constrains),
+                       if( _controller.isShowTyreStatus )
                        GridView.builder(
-                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                           crossAxisCount: 2,
-                           mainAxisSpacing: defaultPadding,
-                           crossAxisSpacing: defaultPadding,
-                           childAspectRatio: constrains.maxWidth / constrains.maxHeight,
-                        ), 
-                        itemBuilder: ( context, index ){
-                            return Container(
-                             padding: const EdgeInsets.all(defaultPadding),
-                              decoration: BoxDecoration(
-                                color: Colors.white10,
-                                border: Border.all(
-                                    color: primaryColor,
-                                    width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text.rich(
-                                    TextSpan(
-                                      text: "23.6",
-                                      style: TextStyle(
-                                        fontSize: 27,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                      ),
-                                      children:[
-                                        TextSpan(
-                                          text: "psi",
-                                          style: TextStyle(
-                                            fontSize: 24
-                                          )
-                                        )
-                                      ] 
-                                    ),
-                                  ),
-                                  const SizedBox( height: defaultPadding, ),
-                                  Text(
-                                    "42\u2103",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    "low".toUpperCase(),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 35
-                                    ),
-                                  ),
-                                  Text(
-                                    "Pressure".toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                    ),
-
-                                  )
-                                ],
-                              ),
-                            );
-                        },
-                    )
+                          itemCount: 4,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: defaultPadding,
+                            crossAxisSpacing: defaultPadding,
+                            childAspectRatio:
+                                constrains.maxWidth / constrains.maxHeight,
+                          ),
+                          itemBuilder: (context, index) => ScaleTransition(
+                            scale: _tyreAnimations[index],
+                            child: TyrePsiCard(
+                              isBottomTwoTyre: index > 1,
+                              tyrePsi: demoPsiList[index],
+                            ),
+                          ),
+                        )
                   ],
                 );
               },
