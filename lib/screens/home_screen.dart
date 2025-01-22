@@ -14,15 +14,26 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final HomeController _controller = HomeController();
 
     late AnimationController _batteryAnimationController;
     late Animation<double> _animationBattery;
     late Animation<double> _animationBatteryStatus;
 
+    late AnimationController _tempAnimationController;
+    late Animation<double> _animationCarShift;
     
-
+    void setupTempAnimation(){
+        _tempAnimationController = AnimationController(
+            vsync: this,
+            duration: Duration(milliseconds: 1500),
+        );
+        _animationCarShift = CurvedAnimation(
+            parent: _tempAnimationController, 
+            curve: Interval(0, 0.2,),
+         );
+    }
 
     void setupBatteryAnimation(){
         _batteryAnimationController = AnimationController(
@@ -44,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     @override
       void initState(){
         setupBatteryAnimation();
+        setupTempAnimation();
         super.initState();
       }
 
@@ -51,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         void dispose() {
           super.dispose();
           _batteryAnimationController.dispose();
+          _tempAnimationController.dispose();
         }
 
   @override
@@ -65,7 +78,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     _batteryAnimationController.forward();
                 }
                 else if ( _controller.selectedBottomTab == 1 && index != 1 ){
-                    _batteryAnimationController.reverse();
+                    _batteryAnimationController.reverse(from: 0.7);
+                }
+                if( index == 2 ){
+                    _tempAnimationController.forward();
+                }
+                else if( _controller.selectedBottomTab == 2 && index != 2 ){
+                    _tempAnimationController.reverse();
                 }
                 _controller.onButtonNavigationTabChange(index);  
             },
@@ -77,19 +96,29 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         return Stack(
                             alignment: Alignment.center,
                             children: [
-                                Padding(
-                                    padding: EdgeInsets.symmetric(vertical: constrains.maxHeight * 0.11),
-                                    child: SvgPicture.asset(
-                                        'assets/Car.svg',
-                                        width: double.infinity,
-                                    ),
+                                SizedBox(
+                                    height: constrains.maxHeight, 
+                                    width: constrains.maxWidth,
                                 ),
+                                Positioned(
+                                left: constrains.maxWidth / 2 * _animationCarShift.value,
+                                height: constrains.maxHeight,
+                                width: constrains.maxWidth,
+                                  child: Padding(
+                                      padding: EdgeInsets.symmetric(vertical: constrains.maxHeight * 0.11),
+                                      child: SvgPicture.asset(
+                                          'assets/Car.svg',
+                                          width: double.infinity,
+                                      ),
+                                  ),
+                                ),
+
                                 AnimatedPositioned(
                                     duration: defaultDuration,
-                                    right: _controller.selectedBottomTab == 1 ? constrains.maxWidth / 2 : constrains.maxWidth * 0.05,
+                                    right: _controller.selectedBottomTab == 0 ? constrains.maxWidth / 0.05 : constrains.maxWidth / 2,
                                     child: AnimatedOpacity(
                                     duration: defaultDuration,
-                                    opacity: _controller.selectedBottomTab == 1 ? 0 : 1,
+                                    opacity: _controller.selectedBottomTab == 0 ? 1 : 0,
                                       child: DoorLock(
                                           press: _controller.updateRightDoorLock,
                                           isLock: _controller.isRightDoorLocked,
@@ -98,10 +127,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 ),
                                 AnimatedPositioned(
                                     duration: defaultDuration,
-                                    left: _controller.selectedBottomTab == 1 ? constrains.maxWidth / 2 : constrains.maxWidth * 0.05,
+                                    left: _controller.selectedBottomTab == 0 ? constrains.maxWidth * 0.05 : constrains.maxWidth / 2,
                                     child: AnimatedOpacity(
                                     duration: defaultDuration,
-                                    opacity: _controller.selectedBottomTab == 1 ? 0 : 1,
+                                    opacity: _controller.selectedBottomTab == 0 ? 1 : 0,
                                       child: DoorLock(
                                           press: _controller.updateLeftDoorLock,
                                           isLock: _controller.isLeftDoorLocked,
@@ -110,10 +139,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 ),
                                 AnimatedPositioned(
                                     duration: defaultDuration,
-                                    top: _controller.selectedBottomTab == 1 ? constrains.maxHeight / 2 : constrains.maxHeight * 0.13,
+                                    top: _controller.selectedBottomTab == 0 ? constrains.maxHeight * 0.13 : constrains.maxHeight / 2,
                                     child: AnimatedOpacity(
                                     duration: defaultDuration,
-                                    opacity: _controller.selectedBottomTab == 1 ? 0 : 1,
+                                    opacity: _controller.selectedBottomTab == 0 ? 1 : 0,
                                       child: DoorLock(
                                           press: _controller.updateBonnetLock,
                                           isLock: _controller.isBonnetLocked,
@@ -122,10 +151,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 ),
                                 AnimatedPositioned(
                                 duration: defaultDuration,
-                                    bottom: _controller.selectedBottomTab == 1 ? constrains.maxHeight / 2 : constrains.maxHeight * 0.17,
+                                    bottom: _controller.selectedBottomTab == 0 ? constrains.maxHeight * 0.17 : constrains.maxHeight / 2,
                                     child: AnimatedOpacity(
                                     duration:defaultDuration,
-                                    opacity: _controller.selectedBottomTab == 1 ? 0 : 1,
+                                    opacity: _controller.selectedBottomTab == 0 ? 0 : 1,
                                       child: DoorLock(
                                           press: _controller.updateTrunkDoorLock,
                                           isLock: _controller.isTrunkLocked,
