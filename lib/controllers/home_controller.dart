@@ -42,6 +42,13 @@ class HomeController extends ChangeNotifier {
     void showTyreController(int index){
         if( selectedBottomTab != 3 && index == 3){
             isShowTyre = true;
+            Future.delayed(
+              Duration( milliseconds: 400 ),
+              (){
+                  isShowTyre = true;
+                  notifyListeners(); 
+              }
+            );
             notifyListeners();
         } else {
             isShowTyre = false; 

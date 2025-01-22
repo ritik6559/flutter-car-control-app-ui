@@ -232,7 +232,73 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
 
                        if( _controller.isShowTyre ) ...tyres(constrains),
-                      
+                       GridView.builder(
+                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                           crossAxisCount: 2,
+                           mainAxisSpacing: defaultPadding,
+                           crossAxisSpacing: defaultPadding,
+                           childAspectRatio: constrains.maxWidth / constrains.maxHeight,
+                        ), 
+                        itemBuilder: ( context, index ){
+                            return Container(
+                             padding: const EdgeInsets.all(defaultPadding),
+                              decoration: BoxDecoration(
+                                color: Colors.white10,
+                                border: Border.all(
+                                    color: primaryColor,
+                                    width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text.rich(
+                                    TextSpan(
+                                      text: "23.6",
+                                      style: TextStyle(
+                                        fontSize: 27,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                      children:[
+                                        TextSpan(
+                                          text: "psi",
+                                          style: TextStyle(
+                                            fontSize: 24
+                                          )
+                                        )
+                                      ] 
+                                    ),
+                                  ),
+                                  const SizedBox( height: defaultPadding, ),
+                                  Text(
+                                    "42\u2103",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    "low".toUpperCase(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 35
+                                    ),
+                                  ),
+                                  Text(
+                                    "Pressure".toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),
+
+                                  )
+                                ],
+                              ),
+                            );
+                        },
+                    )
                   ],
                 );
               },
